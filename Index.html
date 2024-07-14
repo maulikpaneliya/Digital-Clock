@@ -6,8 +6,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-
-
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
         integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
@@ -17,38 +15,73 @@
         let a;
         let date;
         let time;
+        let greeting;
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        setInterval(() => {
-            a = new Date(); 
+
+        async function fetchQuote() {
+            try {
+                const response = await fetch('https://api.quotable.io/random');
+                const data = await response.json();
+                return data.content;
+            } catch (error) {
+                console.error('Error fetching quote:', error);
+                return 'Stay positive, work hard, make it happen.';
+            }
+        }
+
+        setInterval(async () => {
+            a = new Date();
             date = a.toLocaleDateString(undefined, options);
-            time = a.getHours() + ':' + a.getMinutes() + ':' + a.getSeconds();
+
+            let hours = a.getHours();
+            let minutes = a.getMinutes();
+            let seconds = a.getSeconds();
+            let ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // the hour '0' should be '12'
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+
+            time = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
+
+            if (a.getHours() < 12) {
+                greeting = "Good Morning";
+            } else if (a.getHours() < 17) {
+                greeting = "Good Afternoon";
+            } else if (a.getHours() < 20) {
+                greeting = "Good Evening";
+            } else {
+                greeting = "Good Night";
+            }
+
+            greeting += " Maulik";
+
             document.getElementById('time').innerHTML = time + "<br>Date:- " + date;
+            document.getElementById('greeting').innerHTML = greeting;
+
+            const quote = await fetchQuote();
+            document.getElementById('quote').innerHTML = quote;
         }, 1000);
     </script>
 
-        <style>
+    <style>
+        body, div {
+            background-color: black;
+        }
 
-body,div{
-
-    background-color: black;
-}
-
- .btn{
-  background-color: black;
-  border: none;
-  color: white;
-  padding: 7px 10px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  border-radius: 9px;
-
- }
+        .btn {
+            background-color: black;
+            border: none;
+            color: white;
+            padding: 7px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 9px;
+        }
     </style>
 </head>
-
-
 
 <body bgcolor="black">
 
@@ -58,10 +91,10 @@ body,div{
     <div class="container my-4">
         <div class="jumbotron">
             <h1 class="display-4">Time:- <span id="time"></span></h1>
-        
             <hr class="my-4">
-<br>
-    
+            <h2 id="greeting"></h2>
+            <h4 id="quote"></h4>
+            <br>
         </div>
     </div>
 
@@ -79,3 +112,4 @@ body,div{
 </body>
 
 </html>
+
